@@ -23,12 +23,6 @@ server.on('connection', function(socket){
 
   var id = generateID()
   socket.emit('handshake', id)
-  // socket.on('confirmIdentity', function(clientID){
-  //   if (id !== clientID) {
-  //     id = clientID
-  //     socket.emit('confirmVote', votes[id])}
-  //   else {socket.emit('noVote')}
-  // })
 
   socket.emit('voteSummary', prettyVotes(votes))
 

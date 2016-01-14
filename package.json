@@ -1,7 +1,7 @@
 {
-  "name": "websockets_ask-the-audience",
+  "name": "Crowdsource",
   "version": "1.0.0",
-  "description": "Crowdsourcing opinions",
+  "description": "Super quick polling for friends and awesome people",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,19 +9,20 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MowAlon/ask-the-audience.git"
+    "url": "git+https://github.com/MowAlon/crowdsource.git"
   },
   "keywords": [
     "websockets",
     "crowdsource",
-    "survey"
+    "survey",
+    "polling"
   ],
   "author": "Alon Waisman (based on a Turing tutorial)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/MowAlon/ask-the-audience/issues"
+    "url": "https://github.com/MowAlon/crowdsource/issues"
   },
-  "homepage": "https://github.com/MowAlon/ask-the-audience#readme",
+  "homepage": "https://github.com/MowAlon/crowdsource#readme",
   "dependencies": {
     "express": "^4.13.3",
     "ejs": "^1.0.0",
