@@ -14,7 +14,7 @@ const server = socketIO(server_instance)
 //////////////////////
 
 var poll = {}
-// storeDemoPolls()
+storeDemoPolls()
 
 server.on('connection', function(socket){
   console.log('A user has connected.', server.engine.clientsCount)
@@ -56,18 +56,18 @@ app.get('/poll/:id', function(request, response){
 ///// ROUTES /////
 
 
-// function storeDemoPolls(){
-//
-//   poll['publicdemo'] =
-//                { question: 'Who put the bop in the bop shabop shabop?',
-//                  responses: { a: 'Bret', b: 'Matt', c: 'That guy in the back of the club', d: 'Yogi Bear' },
-//                  private: false }
-//
-//   poll['privatedemo'] =
-//               { question: 'What is your greatest fear?',
-//                 responses: { a: 'Clowns', b: "Jeff's hair", c: 'That guy in the back of the club', d: 'Black holes' },
-//                 private: true }
-//
-// }
+function storeDemoPolls(){
+
+  poll['publicdemo'] =
+               { question: 'Who put the bop in the bop shabop shabop?',
+                 responses: { a: 'Bret', b: 'Matt', c: 'That guy in the back of the club', d: 'Yogi Bear' },
+                 private: false }
+
+  poll['privatedemo'] =
+              { question: 'What is your greatest fear?',
+                responses: { a: 'Clowns', b: "Jeff's hair", c: 'That guy in the back of the club', d: 'Black holes' },
+                private: true }
+
+}
 
 module.exports = server
