@@ -3,6 +3,8 @@ const express = require('express')
 const app = express()
 app.set('view engine', 'ejs')
 const socketIO = require('socket.io')
+const generateID = require('./lib/generate-id')
+
 
 var port = process.env.PORT || 3000
 var server_instance = http.createServer(app)
@@ -11,30 +13,44 @@ var server_instance = http.createServer(app)
                   })
 const server = socketIO(server_instance)
 var votes = {}
-// var votesCast
 
 
 server.on('connection', function(socket){
   console.log('A user has connected.', server.engine.clientsCount)
 
   server.sockets.emit('usersConnected', server.engine.clientsCount)
-
   socket.emit('statusMessage', 'You have connected')
-  socket.emit('newVote', prettyVotes(votes))
 
+  var id = generateID()
+  socket.emit('handshake', id)
+  // socket.on('confirmIdentity', function(clientID){
+  //   if (id !== clientID) {
+  //     id = clientID
+  //     socket.emit('confirmVote', votes[id])}
+  //   else {socket.emit('noVote')}
+  // })
+
+  socket.emit('voteSummary', prettyVotes(votes))
 
   socket.on('message', function(channel, message){
     if (channel === 'voteCast'){
-      votes[socket.id] = message
-      server.sockets.emit('newVote', prettyVotes(votes))
+      votes[id] = message
+      console.log('voteCast.votes: ', votes)
+      server.sockets.emit('voteSummary', prettyVotes(votes))
       socket.emit('confirmVote', message)
+    } else if (channel === 'confirmIdentity'){
+      console.log('confirmIdentity.votes: ', votes)
+      if (id !== message && votes[message]) {
+        id = message
+        socket.emit('confirmVote', votes[id])}
+      else {socket.emit('noVote')}
     }
   })
 
   socket.on('disconnect', function(){
     console.log('A user has disconnected.', server.engine.clientsCount)
-    delete votes[socket.id]
-    server.sockets.emit('newVote', prettyVotes(votes))
+    // delete votes[id]
+    server.sockets.emit('voteSummary', prettyVotes(votes))
     server.sockets.emit('usersConnected', server.engine.clientsCount)
   })
 })
