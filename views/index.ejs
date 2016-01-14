@@ -2,21 +2,35 @@
 <html>
   <head>
     <title>Ask the Audience</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="style.css">
   </head>
-  <body>
-    Is there a doctor in the house?
+  <body class='container'>
+    <h1>Ready to ask that burning question?</h1>
 
-    <div id='connection-count'></div>
-    <div id='status-message'></div>
-    <div id='choices'>
-      <button>A</button>
-      <button>B</button>
-      <button>C</button>
-      <button>D</button>
-    </div>
-    <br>
-    <div id='my-vote'></div>
-    <div id='submitted-votes'></div>
+    <section class='create-poll'>
+      <form>
+        <div class='well'>
+          <input type='text' placeholder='What do you want to ask?' class='form-control question'>
+        </div>
+        <div class='well'>
+          <input type='text' placeholder='Response A' class='form-control' id='response-a'>
+          <input type='text' placeholder='Response B' class='form-control' id='response-b'>
+          <input type='text' placeholder='Response C' class='form-control' id='response-c'>
+          <input type='text' placeholder='Response D' class='form-control' id='response-d'>
+          <input type='submit' class='submit-poll btn btn-primary'>
+        </div>
+      </form>
+    </section>
+
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="/client.js"></script>

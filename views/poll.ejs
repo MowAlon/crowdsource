@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Ask the Audience</title>
+  </head>
+  <body>
+
+    <!-- <div id='connection-count'></div>
+    <div id='status-message'></div> -->
+    <div>
+      <h1><%= poll.question %></h1>
+    </div>
+    <div id='choices'>
+      <button>A: <%= poll.responses.a %></button>
+      <button>B: <%= poll.responses.b %></button>
+      <button>C: <%= poll.responses.c %></button>
+      <button>D: <%= poll.responses.d %></button>
+    </div>
+    <br>
+    <div id='my-vote'></div>
+    <div id='submitted-votes'></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/client.js"></script>
+  </body>
+</html>
