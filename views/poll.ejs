@@ -1,24 +1,42 @@
 <!doctype html>
 <html>
   <head>
-    <title>Ask the Audience</title>
+    <title>Crowdsource</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../style.css">
   </head>
   <body>
 
-    <!-- <div id='connection-count'></div>
-    <div id='status-message'></div> -->
-    <div>
-      <h1><%= poll.question %></h1>
+    <div class='container'>
+      <div class='row'>
+        <div>
+          <h1><%= poll.question %></h1>
+        </div>
+        <div class='col-xs-8'>
+          <div class='responses'>
+            <p class='btn btn-danger'><%= poll.responses.a %></p>
+            <p class='btn btn-warning'><%= poll.responses.b %></p>
+            <p class='btn btn-success'><%= poll.responses.c %></p>
+            <p class='btn btn-primary'><%= poll.responses.d %></p>
+          </div>
+        </div>
+        <div class='col-xs-4'>
+          <!-- <% if (!poll.private) { %> -->
+            <!-- <%= This is where results will go if it's not private %> -->
+          <!-- <%= } %> -->
+        </div>
+      </div>
     </div>
-    <div id='choices'>
-      <button>A: <%= poll.responses.a %></button>
-      <button>B: <%= poll.responses.b %></button>
-      <button>C: <%= poll.responses.c %></button>
-      <button>D: <%= poll.responses.d %></button>
-    </div>
-    <br>
+
+
     <div id='my-vote'></div>
     <div id='submitted-votes'></div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="/client.js"></script>

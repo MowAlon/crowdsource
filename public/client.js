@@ -14,7 +14,8 @@ function sendPoll(){
         b: $('#response-b').val(),
         c: $('#response-c').val(),
         d: $('#response-d').val()
-      }
+      },
+      private: $('#private').is(':checked')
     }
 
     client.send('newPoll', poll)
