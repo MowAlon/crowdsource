@@ -9,6 +9,7 @@ input {
   padding-bottom: 10px;
   padding-left: 30px;
   padding-right: 30px;
+  white-space: normal;
   word-wrap: break-word;
   text-align: left;
   display: inline-block;
