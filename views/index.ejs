@@ -10,16 +10,16 @@
     <h1>Ask that burning question</h1>
 
     <section class='create-poll'>
-      <form>
+      <form action='/newpoll' method='post'>
         <div class='well'>
-          <input type='text' placeholder='What do you want to ask?' class='form-control question'>
+          <input type='text' placeholder='What do you want to ask?' name='question' class='form-control question'>
         </div>
         <div class='well'>
-          <input type='text' placeholder='Response A' class='form-control' id='response-a'>
-          <input type='text' placeholder='Response B' class='form-control' id='response-b'>
-          <input type='text' placeholder='Response C' class='form-control' id='response-c'>
-          <input type='text' placeholder='Response D' class='form-control' id='response-d'>
-          <input type='submit' class='submit-poll btn btn-primary'><input type="checkbox" id="private"> Keep results private
+          <input type='text' placeholder='Response A' name='responses[a]' class='form-control' id='response-a'>
+          <input type='text' placeholder='Response B' name='responses[b]' class='form-control' id='response-b'>
+          <input type='text' placeholder='Response C' name='responses[c]' class='form-control' id='response-c'>
+          <input type='text' placeholder='Response D' name='responses[d]' class='form-control' id='response-d'>
+          <input type='submit' class='submit-poll btn btn-primary'><input type="checkbox" name='private' id='private'> Keep results private
         </div>
       </form>
     </section>
@@ -30,7 +30,7 @@
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/client.js"></script>
+    <!-- <script src="/socket.io/socket.io.js"></script>
+    <script src="/client.js"></script> -->
   </body>
 </html>

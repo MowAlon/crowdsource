@@ -3,6 +3,9 @@ const express = require('express')
 const app = express()
 app.set('view engine', 'ejs')
 const socketIO = require('socket.io')
+const bodyParser = require('body-parser');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 const generateID = require('./lib/generate-id')
 
 var port = process.env.PORT || 3000
@@ -13,7 +16,8 @@ var server_instance = http.createServer(app)
 const server = socketIO(server_instance)
 //////////////////////
 
-var poll = {}
+var polls = {}
+var admins = {}
 storeDemoPolls()
 
 server.on('connection', function(socket){
@@ -24,8 +28,8 @@ server.on('connection', function(socket){
   socket.on('message', function(channel, message){
     if (channel === 'newPoll'){
       var url = generateID()
-      poll[url] = message
-      console.log('Poll: ', poll)
+      polls[url] = message
+      console.log('Poll: ', polls)
     } else if (channel === 'confirmIdentity'){
       console.log('confirmIdentity.votes: ', votes)
       if (id !== message && votes[message]) {
@@ -44,12 +48,33 @@ server.on('connection', function(socket){
 ///// ROUTES /////
 
 app.use(express.static('public'))
+
 app.get('/', function (request, response){
   response.render('index')
 })
+
+app.post('/newpoll', function(request, response){
+  var poll_id = generateID()
+  var admin_id = generateID()
+
+  admins[admin_id] = poll_id
+  polls[poll_id] = request.body
+  console.log('Polls --> ', polls)
+  console.log('Admins --> ', admins)
+
+  response.render('poll', {poll: polls[poll_id], admin: true})
+})
+
+app.get('/admin/:id', function(request, response){
+  // pry = require('pryjs'); eval(pry.it)
+  var id = request.params.id
+  if (polls[admins[id]]){response.render('poll', {poll: polls[admins[id]], admin: true})}
+  else {response.render('404')}
+})
+
 app.get('/poll/:id', function(request, response){
-  var url = request.params.id
-  if (poll[url]){response.render('poll', {poll: poll[url]})}
+  var id = request.params.id
+  if (polls[id]){response.render('poll', {poll: polls[id]})}
   else {response.render('404')}
 })
 
@@ -57,17 +82,15 @@ app.get('/poll/:id', function(request, response){
 
 
 function storeDemoPolls(){
-
-  poll['publicdemo'] =
+  polls['publicdemo'] =
                { question: 'Who put the bop in the bop shabop shabop?',
-                 responses: { a: 'Bret', b: 'Matt', c: 'That guy in the back of the club', d: 'Yogi Bear' },
-                 private: false }
+                 responses: { a: 'Bret', b: 'Matt', c: 'That guy in the back of the club', d: 'Yogi Bear' }}
 
-  poll['privatedemo'] =
+  polls['privatedemo'] =
               { question: 'What is your greatest fear?',
                 responses: { a: 'Clowns', b: "Jeff's hair", c: 'That guy in the back of the club', d: 'Black holes' },
-                private: true }
-
+                private: 'on' }
 }
 
 module.exports = server
+// pry = require('pryjs'); eval(pry.it)
