@@ -1,7 +1,7 @@
 var client = io()
 // var connectionCount = document.getElementById('connection-count')
 // var statusMessage = document.getElementById('status-message')
-// var submittedVotes = document.getElementById('submitted-votes')
+var voteResults = document.getElementById('vote-results')
 
 
 var buttons = document.querySelectorAll('.responses .btn')
@@ -18,11 +18,11 @@ client.on('handshake', function(id){
 // client.on('statusMessage', function(message){
 //   statusMessage.innerText = message
 // })
-//
-// client.on('voteSummary', function(votes){
-//   console.log(votes)
-//   submittedVotes.innerHTML = votes
-// })
+
+client.on('voteSummary', function(votes){
+  console.log(votes)
+  voteResults.innerHTML = prettyVotes(votes)
+})
 
 if (notAdmin()){
   var myVote = document.getElementById('my-vote')
@@ -50,4 +50,29 @@ function notAdmin(){
 function pollID(){
   var pathBits = window.location.pathname.split('/')
   return pathBits[pathBits.length-1]
+}
+
+function votesCast(votes){
+  console.log("votes: ", votes)
+  var voteCounts = {}
+
+  for (var clientID in votes){
+    var response = votes[clientID]
+    voteCounts[response] = ++voteCounts[response] || 1
+  }
+  return voteCounts
+
+  // for (var vote in votes){
+  //   voteCounts[votes[vote]]++
+  // }
+}
+
+function prettyVotes(votes){
+  console.log("prettyVotes received 'votes' as --> ", votes)
+  var voteCounts = votesCast(votes)
+  var htmls = ''
+  for (var key in voteCounts){
+    htmls += '<h6>' + key + ': ' + voteCounts[key] + '</h6>'
+  }
+  return "<h2>Live Results<h2>" + htmls
 }

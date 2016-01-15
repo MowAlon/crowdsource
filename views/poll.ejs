@@ -23,7 +23,7 @@
         </div>
         <div class='col-xs-4'>
           <% if (!poll.private || admin) { %>
-            <div id='submitted-votes'></div>
+            <div id='vote-results'></div>
           <% } %>
         </div>
       </div>
@@ -41,7 +41,7 @@
         <script src="/post-links.js"></script>
         <script src="/kill-buttons.js"></script>
       <% } else { %>
-      <div class='row well' id='my-vote'></div>
+      <div class='row well text-center' id='my-vote'></div>
       <% } %>
     </div>
 

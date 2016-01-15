@@ -3,9 +3,9 @@ const express = require('express')
 const app = express()
 app.set('view engine', 'ejs')
 const socketIO = require('socket.io')
-const bodyParser = require('body-parser');
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+const bodyParser = require('body-parser')
+app.use(bodyParser.urlencoded({ extended: true }))
+// app.use(bodyParser.json());
 const generateID = require('./lib/generate-id')
 
 var port = process.env.PORT || 3000
@@ -35,6 +35,7 @@ server.on('connection', function(socket){
     if (channel === 'confirmIdentity'){
       pollID = message.pollID
       clientID = message.clientID
+      socket.emit('voteSummary', votes[pollID])
 
       console.log("knownVote: ", knownVote(pollID, clientID))
       if (knownVote(pollID, clientID)) {
@@ -49,7 +50,7 @@ server.on('connection', function(socket){
 
       votes[pollID][clientID] = message
       console.log('voteCast.votes: ', votes)
-      // server.sockets.emit('voteSummary', prettyVotes(votes))
+      server.sockets.emit('voteSummary', votes[pollID])
       socket.emit('confirmVote', votes[pollID][clientID])
     }
   })
