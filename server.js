@@ -38,7 +38,6 @@ server.on('connection', function(socket){
 
       console.log("knownVote: ", knownVote(pollID, clientID))
       if (knownVote(pollID, clientID)) {
-        var vote = votes[pollID][clientID]
         socket.emit('confirmVote', votes[pollID][clientID])
       }
       else {socket.emit('noVote')}
@@ -65,7 +64,7 @@ server.on('connection', function(socket){
     console.log("clientID: ", clientID)
     console.log("newClientID !== clientID --> ", newClientID !== clientID)
     console.log("votes[pollId] --> ", votes[pollID])
-    console.log("votes[pollID][clientID] --> ", votes[pollID][clientID])
+    // console.log("votes[pollID][clientID] --> ", votes[pollID][clientID])
     return (newClientID !== clientID && votes[pollID] && votes[pollID][clientID])
   }
 })
@@ -83,7 +82,7 @@ app.post('/newpoll', function(request, response){
   var pollID = generateID()
   admins[adminID] = pollID
 
-  storePoll(pollID, request.body)
+  polls[pollID] = request.body
 
   votes[pollID] = {}
   console.log('Polls --> ', polls)
@@ -119,11 +118,17 @@ app.get('/poll/:id', function(request, response){
 function storeDemoPolls(){
   polls['publicdemo'] =
                { question: 'Who put the bop in the bop shabop shabop?',
-                 responses: { "Bret": 0, "Matt": 0, "That guy in the back of the club": 0, "Yogi Bear": 0 }}
+                 responses: {a: "Bret",
+                              b: "Matt",
+                              c: "That guy in the back of the club",
+                              d: "Yogi Bear"}}
 
   polls['privatedemo'] =
               { question: 'What is your greatest fear?',
-                responses: { "Clowns": 0, "Jeff's hair": 0, "That guy in the back of the club": 0, "Black holes": 0 },
+                responses: {a: "Clowns",
+                            b: "Jeff's hair",
+                            c: "That guy in the back of the club",
+                            d: "Black holes"},
                 private: 'on' }
   admins = {publicdemo: 'publicdemo',
             privatedemo: 'privatedemo'}
@@ -131,13 +136,13 @@ function storeDemoPolls(){
             privatedemo: {}}
 }
 
-function storePoll(pollID, pollData){
-  polls[pollID] = {question: pollData.question,
-    private: !!pollData.private}
-    for (var response in pollData.responses){
-      polls[pollID].responses[response] = 0
-    }
-}
+// function storePoll(pollID, pollData){
+//   polls[pollID] = {question: pollData.question,
+//     private: !!pollData.private}
+//     for (var response in pollData.responses){
+//       polls[pollID].responses[response] = 0
+//     }
+// }
 
 
 function accessPath(base, id){
