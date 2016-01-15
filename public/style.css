@@ -14,3 +14,11 @@ input {
   text-align: left;
   display: inline-block;
 }
+
+.admin-response {
+  color: white;
+  border: 1px solid;
+  border-color: black;
+  border-radius: 4px;
+  background-color: gray;
+}

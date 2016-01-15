@@ -1,24 +1,47 @@
 var client = io()
-sendPoll()
+// var connectionCount = document.getElementById('connection-count')
+// var statusMessage = document.getElementById('status-message')
+// var submittedVotes = document.getElementById('submitted-votes')
 
 
-function sendPoll(){
-  $('.submit-poll').on('click', function(e){
+var buttons = document.querySelectorAll('.responses .btn')
 
-    e.preventDefault()
+// client.on('usersConnected', function(count){
+//   connectionCount.innerText = 'Connected Users: ' + count
+// })
 
-    var poll = {
-      question: $('.create-poll .question').val(),
-      responses: {
-        a: $('#response-a').val(),
-        b: $('#response-b').val(),
-        c: $('#response-c').val(),
-        d: $('#response-d').val()
-      },
-      private: $('#private').is(':checked')
-    }
+client.on('handshake', function(id){
+  document.cookie = document.cookie || id
+  client.send('confirmIdentity', document.cookie)
+})
 
-    client.send('newPoll', poll)
+// client.on('statusMessage', function(message){
+//   statusMessage.innerText = message
+// })
+//
+// client.on('voteSummary', function(votes){
+//   console.log(votes)
+//   submittedVotes.innerHTML = votes
+// })
 
+if (notAdmin()){
+  var myVote = document.getElementById('my-vote')
+
+  client.on('noVote', function(){
+    myVote.innerText = "We're anxiously awaiting your response!"
   })
+  client.on('confirmVote', function(vote){
+    myVote.innerText = 'Thanks for voting! You selected ' + vote + '.'
+  })
+
+  for (var i=0; i < buttons.length; i++){
+    buttons[i].addEventListener('click', function(){
+      client.send('voteCast', this.id)
+    })
+  }
+}
+
+function notAdmin(){
+  var path = window.location.pathname
+  return !(path.indexOf('newpoll') >= 0 || path.indexOf('admin') >= 0)
 }

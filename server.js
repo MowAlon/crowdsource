@@ -18,31 +18,42 @@ const server = socketIO(server_instance)
 
 var polls = {}
 var admins = {}
+var votes = {}
 storeDemoPolls()
 
 server.on('connection', function(socket){
   console.log('A user has connected.', server.engine.clientsCount)
+  var clientID = generateID()
+  socket.emit('handshake', clientID)
 
-  server.sockets.emit('usersConnected', server.engine.clientsCount)
+  // server.sockets.emit('usersConnected', server.engine.clientsCount)
 
   socket.on('message', function(channel, message){
-    if (channel === 'newPoll'){
-      var url = generateID()
-      polls[url] = message
-      console.log('Poll: ', polls)
-    } else if (channel === 'confirmIdentity'){
-      console.log('confirmIdentity.votes: ', votes)
-      if (id !== message && votes[message]) {
-        id = message
-        socket.emit('confirmVote', votes[id])}
+    // if (channel === 'newPoll'){
+    //   var url = generateID()
+    //   polls[url] = message
+    //   console.log('Poll: ', polls)
+    if (channel === 'confirmIdentity'){
+      if (oldClient(message) && votes[message]) {
+        clientID = message
+        socket.emit('confirmVote', votes[clientID])
+      }
       else {socket.emit('noVote')}
+    } else if (channel === 'voteCast'){
+      votes[clientID] = message
+      console.log('voteCast.votes: ', votes)
+      // server.sockets.emit('voteSummary', prettyVotes(votes))
+      socket.emit('confirmVote', message)
     }
   })
 
-  socket.on('disconnect', function(){
-    console.log('A user has disconnected.', server.engine.clientsCount)
-    server.sockets.emit('usersConnected', server.engine.clientsCount)
-  })
+  // socket.on('disconnect', function(){
+  //   console.log('A user has disconnected.', server.engine.clientsCount)
+  //   server.sockets.emit('usersConnected', server.engine.clientsCount)
+  // })
+  function oldClient(receivedID){
+    return clientID !== receivedID
+  }
 })
 
 ///// ROUTES /////
