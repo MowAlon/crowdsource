@@ -15,10 +15,10 @@
         <div class='row well'>
         <div class='col-xs-8'>
           <div class='responses'>
-            <p class='btn btn-danger' id='a'><%= poll.responses.a %></p>
-            <p class='btn btn-warning' id='b'><%= poll.responses.b %></p>
-            <p class='btn btn-success' id='c'><%= poll.responses.c %></p>
-            <p class='btn btn-primary' id='d'><%= poll.responses.d %></p>
+            <p class='btn btn-danger' id='a'><%= Object.keys(poll.responses)[0] %></p>
+            <p class='btn btn-warning' id='b'><%= Object.keys(poll.responses)[1] %></p>
+            <p class='btn btn-success' id='c'><%= Object.keys(poll.responses)[2] %></p>
+            <p class='btn btn-primary' id='d'><%= Object.keys(poll.responses)[3] %></p>
           </div>
         </div>
         <div class='col-xs-4'>
@@ -41,7 +41,7 @@
         <script src="/post-links.js"></script>
         <script src="/kill-buttons.js"></script>
       <% } else { %>
-      <div class='row well'><h2 id='my-vote'></h2></div>
+      <div class='row well' id='my-vote'></div>
       <% } %>
     </div>
 

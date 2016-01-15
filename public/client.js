@@ -11,8 +11,8 @@ var buttons = document.querySelectorAll('.responses .btn')
 // })
 
 client.on('handshake', function(id){
-  document.cookie = document.cookie || id
-  client.send('confirmIdentity', document.cookie)
+  localStorage.clientID = localStorage.clientID || id
+  client.send('confirmIdentity', {clientID: localStorage.clientID, pollID: pollID()})
 })
 
 // client.on('statusMessage', function(message){
@@ -28,15 +28,16 @@ if (notAdmin()){
   var myVote = document.getElementById('my-vote')
 
   client.on('noVote', function(){
-    myVote.innerText = "We're anxiously awaiting your response!"
+    myVote.innerHTML = "<h2>We're anxiously awaiting your response!</h2>"
   })
   client.on('confirmVote', function(vote){
-    myVote.innerText = 'Thanks for voting! You selected ' + vote + '.'
+    myVote.innerHTML = "<h4>Thanks for voting! You selected this option:</h4>" +
+                        "<h2>" + vote + "</h2>"
   })
 
   for (var i=0; i < buttons.length; i++){
     buttons[i].addEventListener('click', function(){
-      client.send('voteCast', this.id)
+      client.send('voteCast', this.innerText)
     })
   }
 }
@@ -44,4 +45,9 @@ if (notAdmin()){
 function notAdmin(){
   var path = window.location.pathname
   return !(path.indexOf('newpoll') >= 0 || path.indexOf('admin') >= 0)
+}
+
+function pollID(){
+  var pathBits = window.location.pathname.split('/')
+  return pathBits[pathBits.length-1]
 }

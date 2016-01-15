@@ -22,28 +22,36 @@ var votes = {}
 storeDemoPolls()
 
 server.on('connection', function(socket){
+  var pollID
   console.log('A user has connected.', server.engine.clientsCount)
-  var clientID = generateID()
-  socket.emit('handshake', clientID)
+  var newClientID = generateID()
+  var clientID
+  socket.emit('handshake', newClientID)
 
   // server.sockets.emit('usersConnected', server.engine.clientsCount)
 
   socket.on('message', function(channel, message){
-    // if (channel === 'newPoll'){
-    //   var url = generateID()
-    //   polls[url] = message
-    //   console.log('Poll: ', polls)
+
     if (channel === 'confirmIdentity'){
-      if (oldClient(message) && votes[message]) {
-        clientID = message
-        socket.emit('confirmVote', votes[clientID])
+      pollID = message.pollID
+      clientID = message.clientID
+
+      console.log("knownVote: ", knownVote(pollID, clientID))
+      if (knownVote(pollID, clientID)) {
+        var vote = votes[pollID][clientID]
+        socket.emit('confirmVote', votes[pollID][clientID])
       }
       else {socket.emit('noVote')}
+
     } else if (channel === 'voteCast'){
-      votes[clientID] = message
+      console.log('votes: ', votes)
+      console.log('pollID: ', pollID)
+      console.log('clientID: ', clientID)
+
+      votes[pollID][clientID] = message
       console.log('voteCast.votes: ', votes)
       // server.sockets.emit('voteSummary', prettyVotes(votes))
-      socket.emit('confirmVote', message)
+      socket.emit('confirmVote', votes[pollID][clientID])
     }
   })
 
@@ -51,8 +59,14 @@ server.on('connection', function(socket){
   //   console.log('A user has disconnected.', server.engine.clientsCount)
   //   server.sockets.emit('usersConnected', server.engine.clientsCount)
   // })
-  function oldClient(receivedID){
-    return clientID !== receivedID
+  function knownVote(pollID, clientID){
+    console.log("polls --> ", polls)
+    console.log("pollID: ", pollID)
+    console.log("clientID: ", clientID)
+    console.log("newClientID !== clientID --> ", newClientID !== clientID)
+    console.log("votes[pollId] --> ", votes[pollID])
+    console.log("votes[pollID][clientID] --> ", votes[pollID][clientID])
+    return (newClientID !== clientID && votes[pollID] && votes[pollID][clientID])
   }
 })
 
@@ -67,11 +81,14 @@ app.get('/', function (request, response){
 app.post('/newpoll', function(request, response){
   var adminID = generateID()
   var pollID = generateID()
-
   admins[adminID] = pollID
-  polls[pollID] = request.body
+
+  storePoll(pollID, request.body)
+
+  votes[pollID] = {}
   console.log('Polls --> ', polls)
   console.log('Admins --> ', admins)
+  console.log('Votes --> ', votes)
 
   response.render('poll', {poll: polls[pollID],
                             publicPath: accessPath('poll', pollID),
@@ -102,15 +119,26 @@ app.get('/poll/:id', function(request, response){
 function storeDemoPolls(){
   polls['publicdemo'] =
                { question: 'Who put the bop in the bop shabop shabop?',
-                 responses: { a: 'Bret', b: 'Matt', c: 'That guy in the back of the club', d: 'Yogi Bear' }}
+                 responses: { "Bret": 0, "Matt": 0, "That guy in the back of the club": 0, "Yogi Bear": 0 }}
 
   polls['privatedemo'] =
               { question: 'What is your greatest fear?',
-                responses: { a: 'Clowns', b: "Jeff's hair", c: 'That guy in the back of the club', d: 'Black holes' },
+                responses: { "Clowns": 0, "Jeff's hair": 0, "That guy in the back of the club": 0, "Black holes": 0 },
                 private: 'on' }
   admins = {publicdemo: 'publicdemo',
             privatedemo: 'privatedemo'}
+  votes = {publicdemo: {},
+            privatedemo: {}}
 }
+
+function storePoll(pollID, pollData){
+  polls[pollID] = {question: pollData.question,
+    private: !!pollData.private}
+    for (var response in pollData.responses){
+      polls[pollID].responses[response] = 0
+    }
+}
+
 
 function accessPath(base, id){
   return '/' + base + '/' + id
