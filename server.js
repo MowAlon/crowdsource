@@ -54,27 +54,34 @@ app.get('/', function (request, response){
 })
 
 app.post('/newpoll', function(request, response){
-  var poll_id = generateID()
-  var admin_id = generateID()
+  var adminID = generateID()
+  var pollID = generateID()
 
-  admins[admin_id] = poll_id
-  polls[poll_id] = request.body
+  admins[adminID] = pollID
+  polls[pollID] = request.body
   console.log('Polls --> ', polls)
   console.log('Admins --> ', admins)
 
-  response.render('poll', {poll: polls[poll_id], admin: true})
+  response.render('poll', {poll: polls[pollID],
+                            publicPath: accessPath('poll', pollID),
+                            adminPath: accessPath('admin', adminID),
+                            admin: true})
 })
 
 app.get('/admin/:id', function(request, response){
-  // pry = require('pryjs'); eval(pry.it)
-  var id = request.params.id
-  if (polls[admins[id]]){response.render('poll', {poll: polls[admins[id]], admin: true})}
+  var adminID = request.params.id
+  var pollID = admins[adminID]
+  if (polls[pollID]){response.render('poll', {poll: polls[pollID],
+                                                  publicPath: accessPath('poll', pollID),
+                                                  adminPath: accessPath('admin', adminID),
+                                                  admin: true})}
   else {response.render('404')}
 })
 
 app.get('/poll/:id', function(request, response){
   var id = request.params.id
-  if (polls[id]){response.render('poll', {poll: polls[id]})}
+  if (polls[id]){response.render('poll', {poll: polls[id],
+                                          admin: false})}
   else {response.render('404')}
 })
 
@@ -90,6 +97,12 @@ function storeDemoPolls(){
               { question: 'What is your greatest fear?',
                 responses: { a: 'Clowns', b: "Jeff's hair", c: 'That guy in the back of the club', d: 'Black holes' },
                 private: 'on' }
+  admins = {publicdemo: 'publicdemo',
+            privatedemo: 'privatedemo'}
+}
+
+function accessPath(base, id){
+  return '/' + base + '/' + id
 }
 
 module.exports = server

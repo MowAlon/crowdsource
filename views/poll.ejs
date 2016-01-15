@@ -9,10 +9,10 @@
   <body>
 
     <div class='container'>
-      <div class='row'>
-        <div>
+        <div class='row well'>
           <h1><%= poll.question %></h1>
         </div>
+        <div class='row well'>
         <div class='col-xs-8'>
           <div class='responses'>
             <p class='btn btn-danger'><%= poll.responses.a %></p>
@@ -22,22 +22,31 @@
           </div>
         </div>
         <div class='col-xs-4'>
-          if (!poll.private || admin) {
+          <% if (!poll.private || admin) { %>
             This is where results will go if it's not private
-          }
+          <% } %>
         </div>
       </div>
+
+      <% if (admin) { %>
+        <div class='links'>
+          <h3>Public Link</h3>
+          <div id='public'><%= publicURL %></div>
+          <br>
+            <h3>Admin Link</h3>
+            <div id='admin'><%= adminURL %></div>
+        </div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="/post-links.js"></script>
+      <% } %>
     </div>
 
 
     <div id='my-vote'></div>
     <div id='submitted-votes'></div>
 
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/client.js"></script>
   </body>
