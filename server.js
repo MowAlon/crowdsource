@@ -35,11 +35,12 @@ server.on('connection', function(socket){
     if (channel === 'confirmIdentity'){
       pollID = message.pollID
       clientID = message.clientID
-      socket.emit('voteSummary', votes[pollID])
+
+      socket.emit('voteSummary', polls[pollID])
 
       console.log("knownVote: ", knownVote(pollID, clientID))
       if (knownVote(pollID, clientID)) {
-        socket.emit('confirmVote', votes[pollID][clientID])
+        socket.emit('confirmVote', polls[pollID].votes[clientID])
       }
       else {socket.emit('noVote')}
 
@@ -48,10 +49,10 @@ server.on('connection', function(socket){
       console.log('pollID: ', pollID)
       console.log('clientID: ', clientID)
 
-      votes[pollID][clientID] = message
-      console.log('voteCast.votes: ', votes)
-      server.sockets.emit('voteSummary', votes[pollID])
-      socket.emit('confirmVote', votes[pollID][clientID])
+      polls[pollID].votes[clientID] = message
+      console.log('voteCast.votes: ', polls[pollID].votes)
+      server.sockets.emit('voteSummary', polls[pollID])
+      socket.emit('confirmVote', polls[pollID].votes[clientID])
     }
   })
 
@@ -64,9 +65,9 @@ server.on('connection', function(socket){
     console.log("pollID: ", pollID)
     console.log("clientID: ", clientID)
     console.log("newClientID !== clientID --> ", newClientID !== clientID)
-    console.log("votes[pollId] --> ", votes[pollID])
+    console.log("votes[pollId] --> ", polls[pollID].votes)
     // console.log("votes[pollID][clientID] --> ", votes[pollID][clientID])
-    return (newClientID !== clientID && votes[pollID] && votes[pollID][clientID])
+    return (newClientID !== clientID && polls[pollID].votes && polls[pollID].votes[clientID])
   }
 })
 
@@ -84,11 +85,10 @@ app.post('/newpoll', function(request, response){
   admins[adminID] = pollID
 
   polls[pollID] = request.body
+  polls[pollID].votes = {}
 
-  votes[pollID] = {}
   console.log('Polls --> ', polls)
   console.log('Admins --> ', admins)
-  console.log('Votes --> ', votes)
 
   response.render('poll', {poll: polls[pollID],
                             publicPath: accessPath('poll', pollID),
@@ -118,23 +118,25 @@ app.get('/poll/:id', function(request, response){
 
 function storeDemoPolls(){
   polls['publicdemo'] =
-               { question: 'Who put the bop in the bop shabop shabop?',
-                 responses: {a: "Bret",
-                              b: "Matt",
-                              c: "That guy in the back of the club",
-                              d: "Yogi Bear"}}
+               {question: 'Who put the bop in the bop shabop shabop?',
+                responses: {a: "Bret",
+                            b: "Matt",
+                            c: "That guy in the back of the club",
+                            d: "Yogi Bear"},
+                votes: {}}
 
   polls['privatedemo'] =
-              { question: 'What is your greatest fear?',
+              {question: 'What is your greatest fear?',
                 responses: {a: "Clowns",
                             b: "Jeff's hair",
                             c: "That guy in the back of the club",
                             d: "Black holes"},
-                private: 'on' }
+                private: 'on',
+                votes: {}}
   admins = {publicdemo: 'publicdemo',
             privatedemo: 'privatedemo'}
-  votes = {publicdemo: {},
-            privatedemo: {}}
+  // votes = {publicdemo: {},
+  //           privatedemo: {}}
 }
 
 // function storePoll(pollID, pollData){

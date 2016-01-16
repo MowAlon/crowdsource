@@ -19,9 +19,8 @@ client.on('handshake', function(id){
 //   statusMessage.innerText = message
 // })
 
-client.on('voteSummary', function(votes){
-  console.log(votes)
-  voteResults.innerHTML = prettyVotes(votes)
+client.on('voteSummary', function(poll){
+  if (!poll.private){voteResults.innerHTML = prettyVotes(poll.votes)}
 })
 
 if (notAdmin()){
