@@ -38,21 +38,18 @@ server.on('connection', function(socket){
 
       socket.emit('voteSummary', polls[pollID])
 
-      console.log("knownVote: ", knownVote(pollID, clientID))
       if (knownVote(pollID, clientID)) {
-        socket.emit('confirmVote', polls[pollID].votes[clientID])
+        var vote = polls[pollID].votes[clientID]
+        socket.emit('confirmVote', polls[pollID].responses[vote])
       }
       else {socket.emit('noVote')}
 
     } else if (channel === 'voteCast'){
-      console.log('votes: ', votes)
-      console.log('pollID: ', pollID)
-      console.log('clientID: ', clientID)
-
       polls[pollID].votes[clientID] = message
-      console.log('voteCast.votes: ', polls[pollID].votes)
       server.sockets.emit('voteSummary', polls[pollID])
-      socket.emit('confirmVote', polls[pollID].votes[clientID])
+      // socket.emit('confirmVote', polls[pollID].votes[clientID])
+      var vote = polls[pollID].votes[clientID]
+      socket.emit('confirmVote', polls[pollID].responses[vote])
     }
   })
 
@@ -61,12 +58,6 @@ server.on('connection', function(socket){
   //   server.sockets.emit('usersConnected', server.engine.clientsCount)
   // })
   function knownVote(pollID, clientID){
-    console.log("polls --> ", polls)
-    console.log("pollID: ", pollID)
-    console.log("clientID: ", clientID)
-    console.log("newClientID !== clientID --> ", newClientID !== clientID)
-    console.log("votes[pollId] --> ", polls[pollID].votes)
-    // console.log("votes[pollID][clientID] --> ", votes[pollID][clientID])
     return (newClientID !== clientID && polls[pollID].votes && polls[pollID].votes[clientID])
   }
 })
@@ -86,9 +77,6 @@ app.post('/newpoll', function(request, response){
 
   polls[pollID] = request.body
   polls[pollID].votes = {}
-
-  console.log('Polls --> ', polls)
-  console.log('Admins --> ', admins)
 
   response.render('poll', {poll: polls[pollID],
                             publicPath: accessPath('poll', pollID),
@@ -114,7 +102,6 @@ app.get('/poll/:id', function(request, response){
 })
 
 ///// ROUTES /////
-
 
 function storeDemoPolls(){
   polls['publicdemo'] =

@@ -1,26 +1,14 @@
 var client = io()
 // var connectionCount = document.getElementById('connection-count')
 // var statusMessage = document.getElementById('status-message')
-var voteResults = document.getElementById('vote-results')
-
-
-var buttons = document.querySelectorAll('.responses .btn')
-
-// client.on('usersConnected', function(count){
-//   connectionCount.innerText = 'Connected Users: ' + count
-// })
 
 client.on('handshake', function(id){
   localStorage.clientID = localStorage.clientID || id
   client.send('confirmIdentity', {clientID: localStorage.clientID, pollID: pollID()})
 })
 
-// client.on('statusMessage', function(message){
-//   statusMessage.innerText = message
-// })
-
 client.on('voteSummary', function(poll){
-  if (!poll.private){voteResults.innerHTML = prettyVotes(poll.votes)}
+  if (!poll.private){ visualizeResults(poll) }
 })
 
 if (notAdmin()){
@@ -29,17 +17,21 @@ if (notAdmin()){
   client.on('noVote', function(){
     myVote.innerHTML = "<h2>We're anxiously awaiting your response!</h2>"
   })
+
   client.on('confirmVote', function(vote){
     myVote.innerHTML = "<h4>Thanks for voting! You selected this option:</h4>" +
                         "<h2>" + vote + "</h2>"
   })
 
+  var buttons = document.querySelectorAll('.responses .btn')
   for (var i=0; i < buttons.length; i++){
     buttons[i].addEventListener('click', function(){
-      client.send('voteCast', this.innerText)
+      client.send('voteCast', this.id)
     })
   }
 }
+
+///////////////////////////////////////////////////////
 
 function notAdmin(){
   var path = window.location.pathname
@@ -51,8 +43,20 @@ function pollID(){
   return pathBits[pathBits.length-1]
 }
 
+function visualizeResults(poll){
+  var voteCounts = votesCast(poll.votes)
+  var totalVoteCount = totalVotes(voteCounts)
+    for (vote in poll.responses){
+      var voteCount = voteCounts[vote] || 0
+      var votePercent = (voteCount / totalVoteCount * 100) || 0
+      if (totalVoteCount > 0){
+        renderResultPercentage(vote, votePercent)
+        changeButtonWidth(vote, votePercent)
+      }
+  }
+}
+
 function votesCast(votes){
-  console.log("votes: ", votes)
   var voteCounts = {}
 
   for (var clientID in votes){
@@ -60,18 +64,21 @@ function votesCast(votes){
     voteCounts[response] = ++voteCounts[response] || 1
   }
   return voteCounts
-
-  // for (var vote in votes){
-  //   voteCounts[votes[vote]]++
-  // }
 }
 
-function prettyVotes(votes){
-  console.log("prettyVotes received 'votes' as --> ", votes)
-  var voteCounts = votesCast(votes)
-  var htmls = ''
-  for (var key in voteCounts){
-    htmls += '<h6>' + key + ': ' + voteCounts[key] + '</h6>'
+function totalVotes(voteCounts){
+  var result = 0
+  for (vote in voteCounts){
+    result += voteCounts[vote]
   }
-  return "<h2>Live Results<h2>" + htmls
+  return result
+}
+
+function renderResultPercentage(vote, votePercent){
+  document.getElementById('result-' + vote).innerText = Math.round(votePercent) + '%'
+}
+
+function changeButtonWidth(vote, votePercent){
+  var width = (votePercent)/2 + 50
+  $('#' + vote).css('width', width + '%')
 }
