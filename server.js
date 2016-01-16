@@ -53,10 +53,10 @@ server.on('connection', function(socket){
     }
   })
 
-  // socket.on('disconnect', function(){
-  //   console.log('A user has disconnected.', server.engine.clientsCount)
-  //   server.sockets.emit('usersConnected', server.engine.clientsCount)
-  // })
+  socket.on('disconnect', function(){
+    console.log('A user has disconnected.', server.engine.clientsCount)
+  })
+  
   function knownVote(pollID, clientID){
     return (newClientID !== clientID && polls[pollID].votes && polls[pollID].votes[clientID])
   }
@@ -75,7 +75,7 @@ app.post('/newpoll', function(request, response){
   var pollID = generateID()
   admins[adminID] = pollID
 
-  polls[pollID] = request.body
+  polls[pollID] = pollWithoutEmptyResponses(request.body)
   polls[pollID].votes = {}
 
   response.render('poll', {poll: polls[pollID],
@@ -126,14 +126,13 @@ function storeDemoPolls(){
   //           privatedemo: {}}
 }
 
-// function storePoll(pollID, pollData){
-//   polls[pollID] = {question: pollData.question,
-//     private: !!pollData.private}
-//     for (var response in pollData.responses){
-//       polls[pollID].responses[response] = 0
-//     }
-// }
+function pollWithoutEmptyResponses(poll){
+  for (var response in poll.responses){
+    if (!poll.responses[response]){delete poll.responses[response]}
+  }
 
+  return poll
+}
 
 function accessPath(base, id){
   return '/' + base + '/' + id

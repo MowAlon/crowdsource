@@ -2,16 +2,18 @@ var client = io()
 // var connectionCount = document.getElementById('connection-count')
 // var statusMessage = document.getElementById('status-message')
 
-client.on('handshake', function(id){
-  localStorage.clientID = localStorage.clientID || id
-  client.send('confirmIdentity', {clientID: localStorage.clientID, pollID: pollID()})
-})
 
 client.on('voteSummary', function(poll){
   if (!poll.private){ visualizeResults(poll) }
 })
 
 if (notAdmin()){
+
+  client.on('handshake', function(id){
+    localStorage.clientID = localStorage.clientID || id
+    client.send('confirmIdentity', {clientID: localStorage.clientID, pollID: pollID()})
+  })
+
   var myVote = document.getElementById('my-vote')
 
   client.on('noVote', function(){
