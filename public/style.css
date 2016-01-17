@@ -45,3 +45,11 @@ input {
   border-radius: 4px;
   background-color: gray;
 }
+
+.input-group {
+  margin: 10px;
+}
+
+.input-group input {
+  margin: 0px;
+}

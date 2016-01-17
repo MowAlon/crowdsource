@@ -56,7 +56,7 @@ server.on('connection', function(socket){
   socket.on('disconnect', function(){
     console.log('A user has disconnected.', server.engine.clientsCount)
   })
-  
+
   function knownVote(pollID, clientID){
     return (newClientID !== clientID && polls[pollID].votes && polls[pollID].votes[clientID])
   }
@@ -77,6 +77,7 @@ app.post('/newpoll', function(request, response){
 
   polls[pollID] = pollWithoutEmptyResponses(request.body)
   polls[pollID].votes = {}
+  // pry = require('pryjs'); eval(pry.it)
 
   response.render('poll', {poll: polls[pollID],
                             publicPath: accessPath('poll', pollID),

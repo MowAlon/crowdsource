@@ -7,7 +7,6 @@
     <link rel="stylesheet" type="text/css" href="../style.css">
   </head>
   <body>
-
     <div class='container'>
       <div class='row well'>
         <h1><%= poll.question %></h1>
@@ -37,7 +36,11 @@
         <div class='row well text-center' id='my-vote'></div>
       <% } %>
 
-      <script>var admin = <%= admin %></script>
+      <script src="/lib/moment.js"></script>
+      <script>
+        var admin = <%= admin %>
+        var pollExpiration = "<%= poll.expiration %>"
+      </script>
       <script src='/adjust-buttons.js'></script>
     </div>
 

@@ -1,15 +1,22 @@
-if (admin) {killButtons()}
+console.log('In adjust-buttons.js, pollExpiration is --> ', pollExpiration)
+if (admin || pollExpired()) {killButtons()}
 else {activateButtons()}
 
 /////////////////////////
 
+function pollExpired(){
+  var now = moment(Date())
+  var expiration = moment(pollExpiration)
+  return (now >= expiration)
+}
+
 function killButtons() {
-  $('.responses .btn').each(function(index, button){
+  $('.responses button').each(function(index, button){
     killButton(button)
   })
 }
 function killButton(button){
-  $('.responses .btn').each(function(index, button){
+  $('.responses button').each(function(index, button){
     button.className = 'dead-button'
   })
 }
@@ -25,5 +32,5 @@ function activateButtons(){
   })
 }
 function activateButton(classes, button){
-  $(button).addClass(classes[button.id])
+  button.className = classes[button.id]
 }
