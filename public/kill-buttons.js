@@ -6,6 +6,6 @@ $(document).ready(function() {
 
 function killButton(button){
   $('.responses .btn').each(function(index, button){
-    button.className = 'admin-response'
+    button.className = 'dead-button'
   })
 }
