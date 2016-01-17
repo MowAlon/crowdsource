@@ -24,7 +24,6 @@
       </div>
 
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-      <script src='/color-buttons.js'></script>
       <% if (admin) { %>
         <div class='links'>
           <h3>Public Link</h3>
@@ -34,10 +33,12 @@
             <div id='admin'><%= adminPath %></div>
         </div>
         <script src="/post-links.js"></script>
-        <script src="/kill-buttons.js"></script>
       <% } else { %>
-      <div class='row well text-center' id='my-vote'></div>
+        <div class='row well text-center' id='my-vote'></div>
       <% } %>
+
+      <script>var admin = <%= admin %></script>
+      <script src='/adjust-buttons.js'></script>
     </div>
 
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>

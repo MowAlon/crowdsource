@@ -7,7 +7,7 @@ client.on('voteSummary', function(poll){
   if (!poll.private){ visualizeResults(poll) }
 })
 
-if (notAdmin()){
+if (!admin){
 
   client.on('handshake', function(id){
     localStorage.clientID = localStorage.clientID || id
@@ -35,10 +35,10 @@ if (notAdmin()){
 
 ///////////////////////////////////////////////////////
 
-function notAdmin(){
-  var path = window.location.pathname
-  return !(path.indexOf('newpoll') >= 0 || path.indexOf('admin') >= 0)
-}
+// function notAdmin(){
+//   var path = window.location.pathname
+//   return !(path.indexOf('newpoll') >= 0 || path.indexOf('admin') >= 0)
+// }
 
 function pollID(){
   var pathBits = window.location.pathname.split('/')
