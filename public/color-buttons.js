@@ -1,8 +1,8 @@
-var classes = {a: 'btn-danger',
-               b: 'btn-warning',
-               c: 'btn-success',
-               d: 'btn-primary'}
+var classes = {a: 'btn btn-danger',
+               b: 'btn btn-warning',
+               c: 'btn btn-success',
+               d: 'btn btn-primary'}
 
-$('.responses .btn').each(function(index, button){
+$('.responses button').each(function(index, button){
   $(button).addClass(classes[button.id])
 })

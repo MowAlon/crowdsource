@@ -16,31 +16,11 @@
 
         <% for (var response in poll.responses){ %>
           <div class='response'>
-            <p class='response-result' id='result-' + <%= response %>></p>
-            <button class='btn' id=<%= response %>><%= poll.responses[response] %></button>
+            <p class='response-result' id='result-<%= response %>'></p>
+            <button id=<%= response %>><%= poll.responses[response] %></button>
           </div>
         <% } %>
 
-          <!-- <div class='response'>
-            <p class='response-result' id='result-b'></p>
-            <button class='btn btn-warning' id='b'><%= poll.responses.b %></button>
-          </div>
-
-          <div class='response'>
-            <p class='response-result' id='result-c'></p>
-            <button class='btn btn-success' id='c'><%= poll.responses.c %></button>
-          </div>
-
-          <div class='response'>
-            <p class='response-result' id='result-d'></p>
-            <button class='btn btn-primary' id='d'><%= poll.responses.d %></button>
-          </div> -->
-
-      <!-- <div class='col-xs-4'>
-        <% if (!poll.private || admin) { %>
-          <div id='vote-results'></div>
-        <% } %>
-      </div> -->
       </div>
 
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
