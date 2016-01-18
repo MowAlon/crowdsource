@@ -15,32 +15,16 @@ client.on('voteSummary', function(pollData){
 })
 
 client.on('newExpiration', function(pollData){
-  var expiration = document.getElementById('expiration-message')
   var pollExpiration = pollData.pollExpiration
   var pollID = pollData.pollID
 
   if (pollID === clientPollID) {
-    if (pollExpiration !== '') {
-      expiration.innerText = expirationMessage()
-    } else if (pollExpiration === '') {
-      expiration.innerText = ''
-    }
-  }
-
-  function expirationMessage(){
-    if (pollExpired()) {return 'Poll is closed.'}
-    else {return 'Poll closes ' + moment(pollExpiration).calendar().toLowerCase()}
-  }
-
-  function pollExpired(){
-    var now = moment()
-    var expiration = moment(pollExpiration)
-    return (now >= expiration)
+    displayExpirationMessage(pollExpiration)
+    adjustButtons(pollExpiration)
   }
 })
 
 if (!admin){
-
   var myVote = document.getElementById('my-vote')
 
   client.on('noVote', function(){
@@ -74,11 +58,6 @@ if (!admin){
 }
 
 ///////////////////////////////////////////////////////
-
-// function notAdmin(){
-//   var path = window.location.pathname
-//   return !(path.indexOf('newpoll') >= 0 || path.indexOf('admin') >= 0)
-// }
 
 function pageID(){
   var pathBits = window.location.pathname.split('/')

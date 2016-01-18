@@ -1,13 +1,18 @@
-if (admin || pollExpired()) {killButtons()}
-else {activateButtons()}
+adjustButtons(pollExpiration)
+
+function adjustButtons(newPollExpiration){
+  if (admin || pollExpired(newPollExpiration)) {killButtons()}
+  else {activateButtons()}
+}
 
 /////////////////////////
 
-function pollExpired(){
-  var now = moment()
-  var expiration = moment(pollExpiration)
-  return (now >= expiration)
-}
+// function pollExpired(){
+//   var now = moment()
+//   var expiration = moment(pollExpiration)
+//   console.log('poll expired? ', expiration <= now)
+//   return (expiration <= now)
+// }
 
 function killButtons() {
   $('.responses button').each(function(index, button){
