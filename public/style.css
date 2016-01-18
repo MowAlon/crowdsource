@@ -53,3 +53,12 @@ input {
 .input-group input {
   margin: 0px;
 }
+
+.admin-panel button {
+  margin-right: 10px;
+}
+
+#expiration-message {
+  color: red;
+  font-weight: bolder;
+}

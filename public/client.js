@@ -2,17 +2,36 @@ var client = io()
 // var connectionCount = document.getElementById('connection-count')
 // var statusMessage = document.getElementById('status-message')
 
+client.on('handshake', function(id){
+  localStorage.clientID = localStorage.clientID || id
+  client.send('confirmIdentity', {clientID: localStorage.clientID, pollID: pollOrAdminID('poll'), adminID: pollOrAdminID('admin')})
+})
 
 client.on('voteSummary', function(poll){
   if (!poll.private){ visualizeResults(poll) }
 })
 
-if (!admin){
+client.on('newExpiration', function(pollExpiration){
+  expiration = document.getElementById('expiration-message')
+  if (pollExpiration !== '') {
+    expiration.innerText = expirationMessage()
+  } else if (pollExpiration === '') {
+    expiration.innerText = ''
+  }
 
-  client.on('handshake', function(id){
-    localStorage.clientID = localStorage.clientID || id
-    client.send('confirmIdentity', {clientID: localStorage.clientID, pollID: pollID()})
-  })
+  function expirationMessage(){
+    if (pollExpired()) {return 'Poll is closed.'}
+    else {return 'Poll closes ' + moment(pollExpiration).calendar().toLowerCase()}
+  }
+
+  function pollExpired(){
+    var now = moment()
+    var expiration = moment(pollExpiration)
+    return (now >= expiration)
+  }
+})
+
+if (!admin){
 
   var myVote = document.getElementById('my-vote')
 
@@ -25,12 +44,25 @@ if (!admin){
                         "<h2>" + vote + "</h2>"
   })
 
-  var buttons = document.querySelectorAll('.responses .btn')
-  for (var i=0; i < buttons.length; i++){
-    buttons[i].addEventListener('click', function(){
+  var responseButtons = document.querySelectorAll('.responses .btn')
+  for (var i=0; i < responseButtons.length; i++){
+    responseButtons[i].addEventListener('click', function(){
       client.send('voteCast', this.id)
     })
   }
+
+} else {
+
+  document.getElementById('close-poll').addEventListener('click', function(){
+    var expiration = moment().format('L ' + 'h:mm A')
+    document.getElementById('expiration').value = expiration
+    client.send('saveExpiration', expiration)
+  })
+  document.getElementById('save-expiration').addEventListener('click', function(){
+    var expiration = document.getElementById('expiration').value
+    client.send('saveExpiration', expiration)
+  })
+
 }
 
 ///////////////////////////////////////////////////////
@@ -40,9 +72,9 @@ if (!admin){
 //   return !(path.indexOf('newpoll') >= 0 || path.indexOf('admin') >= 0)
 // }
 
-function pollID(){
+function pollOrAdminID(type){
   var pathBits = window.location.pathname.split('/')
-  return pathBits[pathBits.length-1]
+  if (pathBits[pathBits.length-2] === type) {return pathBits[pathBits.length-1]}
 }
 
 function visualizeResults(poll){

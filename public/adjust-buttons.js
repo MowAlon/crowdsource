@@ -1,4 +1,3 @@
-console.log('In adjust-buttons.js, pollExpiration is --> ', pollExpiration)
 if (admin || pollExpired()) {killButtons()}
 else {activateButtons()}
 

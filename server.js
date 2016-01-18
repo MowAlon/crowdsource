@@ -33,7 +33,8 @@ server.on('connection', function(socket){
   socket.on('message', function(channel, message){
 
     if (channel === 'confirmIdentity'){
-      pollID = message.pollID
+      if (message.pollID) {pollID = message.pollID}
+      else if (message.adminID) {pollID = admins[message.adminID]}
       clientID = message.clientID
 
       socket.emit('voteSummary', polls[pollID])
@@ -44,12 +45,18 @@ server.on('connection', function(socket){
       }
       else {socket.emit('noVote')}
 
-    } else if (channel === 'voteCast'){
+    } else if (channel === 'voteCast') {
       polls[pollID].votes[clientID] = message
       server.sockets.emit('voteSummary', polls[pollID])
-      // socket.emit('confirmVote', polls[pollID].votes[clientID])
+
       var vote = polls[pollID].votes[clientID]
       socket.emit('confirmVote', polls[pollID].responses[vote])
+
+    } else if (channel === 'saveExpiration') {
+
+      polls[pollID].expiration = message
+console.log(polls[pollID].expiration)
+      server.sockets.emit('newExpiration', polls[pollID].expiration)
     }
   })
 
@@ -79,10 +86,11 @@ app.post('/newpoll', function(request, response){
   polls[pollID].votes = {}
   // pry = require('pryjs'); eval(pry.it)
 
-  response.render('poll', {poll: polls[pollID],
-                            publicPath: accessPath('poll', pollID),
-                            adminPath: accessPath('admin', adminID),
-                            admin: true})
+  // response.render('poll', {poll: polls[pollID],
+  //                           publicPath: accessPath('poll', pollID),
+  //                           adminPath: accessPath('admin', adminID),
+  //                           admin: true})
+  response.redirect('/admin/' + adminID)
 })
 
 app.get('/admin/:id', function(request, response){

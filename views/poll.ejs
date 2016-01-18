@@ -7,6 +7,12 @@
     <link rel="stylesheet" type="text/css" href="../style.css">
   </head>
   <body>
+    <script>
+      var admin = <%= admin %>
+      var pollExpiration = "<%= poll.expiration %>"
+      if (pollExpiration === 'undefined') {pollExpiration = ''}
+    </script>
+
     <div class='container'>
       <div class='row well'>
         <h1><%= poll.question %></h1>
@@ -20,30 +26,41 @@
           </div>
         <% } %>
 
+        <div class='text-right' id='expiration-message'></div>
       </div>
 
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-      <% if (admin) { %>
-        <div class='links'>
-          <h3>Public Link</h3>
-          <div id='public'><%= publicPath %></div>
-          <br>
-            <h3>Admin Link</h3>
-            <div id='admin'><%= adminPath %></div>
-        </div>
-        <script src="/post-links.js"></script>
-      <% } else { %>
-        <div class='row well text-center' id='my-vote'></div>
-      <% } %>
+      <script src="/lib/moment.min.js"></script>
+      <div class='row well'>
+        <% if (admin) { %>
+          <div class='admin-panel'>
+            <div>
+              <% include /expiration-input %>
+            </div>
+            <div class='expiration-buttons text-right'>
+              <button class='btn btn-danger' id='close-poll'>Close poll</button>
+              <button class='btn btn-primary' id='save-expiration'>Save new expiration</button>
+            </div>
+            <div class='links'>
+              <h3>Public Link</h3>
+              <div id='public'><%= publicPath %></div>
+              <br>
+              <h3>Admin Link</h3>
+              <div id='admin'><%= adminPath %></div>
+            </div>
+            <script src="/post-links.js"></script>
+            <script src="/set-datetimepicker.js"></script>
+            <script src="/lib/bootstrap-datetimepicker.min.js"></script>
+          </div>
+        <% } else { %>
+          <div class='text-center' id='my-vote'></div>
+        <% } %>
+      </div>
 
-      <script src="/lib/moment.js"></script>
-      <script>
-        var admin = <%= admin %>
-        var pollExpiration = "<%= poll.expiration %>"
-      </script>
       <script src='/adjust-buttons.js'></script>
     </div>
 
+    <script src="/expiration-message.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/client.js"></script>
