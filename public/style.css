@@ -62,3 +62,27 @@ input {
   color: red;
   font-weight: bolder;
 }
+
+#new-comment input {
+  margin: 0px;
+  margin-bottom: 10px;
+}
+
+#new-comment #comment-name {
+  width: 200px;
+}
+
+#new-comment h2 {
+  margin-top: 0px;
+  margin-bottom: 20px;
+}
+
+.comment {
+  border: 1px solid black;
+  padding: 5px;
+  margin: 5px;
+}
+
+hr {
+  border-color: black;
+}

@@ -5,14 +5,14 @@ app.set('view engine', 'ejs')
 const socketIO = require('socket.io')
 const bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({ extended: true }))
-// app.use(bodyParser.json());
 const generateID = require('./lib/generate-id')
+const moment = require('./public/lib/moment.min.js')
 
 var port = process.env.PORT || 3000
 var server_instance = http.createServer(app)
                           .listen(port, function(){
-                      console.log('Listening on port ' + port + '.')
-                      })
+                            console.log('Listening on port ' + port + '.')
+                            })
 const server = socketIO(server_instance)
 //////////////////////
 
@@ -23,6 +23,7 @@ storeDemoPolls()
 
 server.on('connection', function(socket){
   var pollID
+  var poll
   console.log('A user has connected.', server.engine.clientsCount)
   var newClientID = generateID()
   var clientID
@@ -35,27 +36,40 @@ server.on('connection', function(socket){
     if (channel === 'confirmIdentity'){
       if (message.pageType === 'poll') {pollID = message.pageID}
       else if (message.pageType === 'admin') {pollID = admins[message.pageID]}
+      poll = polls[pollID]
       clientID = message.clientID
 
-      socket.emit('voteSummary', {poll: polls[pollID], pollID: pollID})
+      socket.emit('loadExistingData', {poll: poll, pollID: pollID})
 
       if (knownVote(pollID, clientID)) {
-        var vote = polls[pollID].votes[clientID]
-        socket.emit('confirmVote', polls[pollID].responses[vote])
+        var vote = poll.votes[clientID]
+        socket.emit('confirmVote', poll.responses[vote])
       }
       else {socket.emit('noVote')}
-
-    } else if (channel === 'voteCast') {
-      polls[pollID].votes[clientID] = message
-      server.sockets.emit('voteSummary', {poll: polls[pollID], pollID: pollID})
-
-      var vote = polls[pollID].votes[clientID]
-      socket.emit('confirmVote', polls[pollID].responses[vote])
-
-    } else if (channel === 'saveExpiration') {
-      polls[pollID].expiration = message
-      server.sockets.emit('newExpiration', {pollExpiration: polls[pollID].expiration, pollID: pollID})
     }
+
+    else if (channel === 'voteCast') {
+      poll.votes[clientID] = message
+      server.sockets.emit('loadExistingData', {poll: poll, pollID: pollID})
+
+      var vote = poll.votes[clientID]
+      socket.emit('confirmVote', poll.responses[vote])
+    }
+
+    else if (channel === 'saveExpiration') {
+      poll.expiration = message
+      server.sockets.emit('newExpiration', {pollExpiration: poll.expiration, pollID: pollID})
+    }
+
+    else if (channel === 'saveNewComment') {
+      var comment = {time: moment(),
+                     name: message.name,
+                     comment: message.comment}
+
+      poll.comments.push(comment)
+      server.sockets.emit('displayNewComment', {comment: comment, pollID: pollID})
+    }
+
   })
 
   socket.on('disconnect', function(){
@@ -82,12 +96,9 @@ app.post('/newpoll', function(request, response){
 
   polls[pollID] = pollWithoutEmptyResponses(request.body)
   polls[pollID].votes = {}
+  polls[pollID].comments = []
   // pry = require('pryjs'); eval(pry.it)
 
-  // response.render('poll', {poll: polls[pollID],
-  //                           publicPath: accessPath('poll', pollID),
-  //                           adminPath: accessPath('admin', adminID),
-  //                           admin: true})
   response.redirect('/admin/' + adminID)
 })
 
@@ -117,20 +128,35 @@ function storeDemoPolls(){
                             b: "Matt",
                             c: "That guy in the back of the club",
                             d: "Yogi Bear"},
-                votes: {}}
+                votes: {},
+                comments: [{time: 'Mon Jan 17 2016 11:31:03 GMT-0700 (MST)',
+                                   name: 'Clarence',
+                                   comment: "Was't it Zach?"},
+                           {time: 'Mon Jan 18 2016 15:30:03 GMT-0700 (MST)',
+                                   name: 'Thomas',
+                                   comment: "I always thought it was Queen Latifah."}
+                          ]
+               }
 
   polls['privatedemo'] =
               {question: 'What is your greatest fear?',
-                responses: {a: "Clowns",
-                            b: "Jeff's hair",
-                            c: "That guy in the back of the club",
-                            d: "Black holes"},
-                private: 'on',
-                votes: {}}
+               responses: {a: "Clowns",
+                           b: "Jeff's hair",
+                           c: "That guy in the back of the club",
+                           d: "Black holes"},
+               private: 'on',
+               votes: {},
+               comments: [{time: 'Mon Jan 18 2016 11:31:03 GMT-0700 (MST)',
+                                  name: 'Clarence',
+                                  comment: "I'm scared of everything!"},
+                          {time: 'Mon Jan 18 2016 11:31:03 GMT-0700 (MST)',
+                                  name: 'Clarence',
+                                  comment: "I'm scared of everything!"}
+                         ]
+              }
+
   admins = {publicdemo: 'publicdemo',
             privatedemo: 'privatedemo'}
-  // votes = {publicdemo: {},
-  //           privatedemo: {}}
 }
 
 function pollWithoutEmptyResponses(poll){

@@ -1,27 +1,44 @@
 var client = io()
 var clientPollID
+commentsDiv = document.getElementById('comments')
+
 
 client.on('handshake', function(id){
   localStorage.clientID = localStorage.clientID || id
   client.send('confirmIdentity', {clientID: localStorage.clientID, pageID: pageID(), pageType: pageType()})
 })
 
-client.on('voteSummary', function(pollData){
+client.on('loadExistingData', function(pollData){
   var poll = pollData.poll
   var pollID = pollData.pollID
   clientPollID = clientPollID || pollID
 
-  if (pollID === clientPollID && !poll.private){ visualizeResults(poll) }
+  if (relevantClient(pollID)){
+    if (!poll.private) {visualizeResults(poll)}
+    loadComments(poll.comments)
+  }
 })
 
 client.on('newExpiration', function(pollData){
   var pollExpiration = pollData.pollExpiration
   var pollID = pollData.pollID
 
-  if (pollID === clientPollID) {
+  if (relevantClient(pollID)) {
     displayExpirationMessage(pollExpiration)
     adjustButtons(pollExpiration)
   }
+})
+
+client.on('displayNewComment', function(commentData){
+  var comment = commentData.comment
+  var pollID = commentData.pollID
+  if (relevantClient(pollID)) {addComment(comment)}
+})
+
+document.getElementById('comment-button').addEventListener('click', function(){
+  var name = document.getElementById('comment-name').value
+  var comment = document.getElementById('comment-text').value
+  client.send('saveNewComment', {name: name, comment: comment})
 })
 
 if (!admin){
@@ -69,6 +86,10 @@ function pageType(){
   return pathBits[pathBits.length-2]
 }
 
+function relevantClient(pollID){
+  return (pollID === clientPollID)
+}
+
 function visualizeResults(poll){
   var voteCounts = votesCast(poll.votes)
   var totalVoteCount = totalVotes(voteCounts)
@@ -80,6 +101,28 @@ function visualizeResults(poll){
         changeButtonWidth(vote, votePercent)
       }
   }
+}
+
+function loadComments(comments){
+  sortedComments = comments.sort(function(a,b){
+                     if (a.time > b.time) {return 1}
+                     if (a.time < b.time) {return -1}
+                     return 0
+                   })
+
+  sortedComments.forEach(function(comment){
+    addComment(comment)
+  })
+}
+
+function addComment(comment){
+  var commentHTML =
+          "<div class='comment'>" +
+            "<p class='comment-time'>" + comment.time + "</p>" +
+            "<p class='comment-name'>" + comment.name + "</p>" +
+            "<p class='comment-comment'>" + comment.comment + "</p>" +
+          "</div>"
+  $(commentsDiv).append(commentHTML)
 }
 
 function votesCast(votes){
