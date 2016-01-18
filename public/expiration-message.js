@@ -5,7 +5,7 @@ if (pollExpiration) {
 
 function expirationMessage(){
   if (pollExpired()) {return 'Poll is closed'}
-  else {return 'Poll closes ' + moment(pollExpiration).calendar().toLowerCase()}
+  else {return 'Poll closes ' + moment(pollExpiration).calendar()}
 }
 
 function pollExpired(){

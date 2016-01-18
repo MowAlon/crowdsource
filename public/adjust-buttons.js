@@ -4,7 +4,7 @@ else {activateButtons()}
 /////////////////////////
 
 function pollExpired(){
-  var now = moment(Date())
+  var now = moment()
   var expiration = moment(pollExpiration)
   return (now >= expiration)
 }

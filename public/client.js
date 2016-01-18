@@ -1,22 +1,30 @@
 var client = io()
-// var connectionCount = document.getElementById('connection-count')
-// var statusMessage = document.getElementById('status-message')
+var clientPollID
 
 client.on('handshake', function(id){
   localStorage.clientID = localStorage.clientID || id
-  client.send('confirmIdentity', {clientID: localStorage.clientID, pollID: pollOrAdminID('poll'), adminID: pollOrAdminID('admin')})
+  client.send('confirmIdentity', {clientID: localStorage.clientID, pageID: pageID(), pageType: pageType()})
 })
 
-client.on('voteSummary', function(poll){
-  if (!poll.private){ visualizeResults(poll) }
+client.on('voteSummary', function(pollData){
+  var poll = pollData.poll
+  var pollID = pollData.pollID
+  clientPollID = clientPollID || pollID
+
+  if (pollID === clientPollID && !poll.private){ visualizeResults(poll) }
 })
 
-client.on('newExpiration', function(pollExpiration){
-  expiration = document.getElementById('expiration-message')
-  if (pollExpiration !== '') {
-    expiration.innerText = expirationMessage()
-  } else if (pollExpiration === '') {
-    expiration.innerText = ''
+client.on('newExpiration', function(pollData){
+  var expiration = document.getElementById('expiration-message')
+  var pollExpiration = pollData.pollExpiration
+  var pollID = pollData.pollID
+
+  if (pollID === clientPollID) {
+    if (pollExpiration !== '') {
+      expiration.innerText = expirationMessage()
+    } else if (pollExpiration === '') {
+      expiration.innerText = ''
+    }
   }
 
   function expirationMessage(){
@@ -72,15 +80,20 @@ if (!admin){
 //   return !(path.indexOf('newpoll') >= 0 || path.indexOf('admin') >= 0)
 // }
 
-function pollOrAdminID(type){
+function pageID(){
   var pathBits = window.location.pathname.split('/')
-  if (pathBits[pathBits.length-2] === type) {return pathBits[pathBits.length-1]}
+  return pathBits[pathBits.length-1]
+}
+
+function pageType(){
+  var pathBits = window.location.pathname.split('/')
+  return pathBits[pathBits.length-2]
 }
 
 function visualizeResults(poll){
   var voteCounts = votesCast(poll.votes)
   var totalVoteCount = totalVotes(voteCounts)
-    for (vote in poll.responses){
+    for (var vote in poll.responses){
       var voteCount = voteCounts[vote] || 0
       var votePercent = (voteCount / totalVoteCount * 100) || 0
       if (totalVoteCount > 0){
@@ -102,7 +115,7 @@ function votesCast(votes){
 
 function totalVotes(voteCounts){
   var result = 0
-  for (vote in voteCounts){
+  for (var vote in voteCounts){
     result += voteCounts[vote]
   }
   return result

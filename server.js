@@ -33,11 +33,11 @@ server.on('connection', function(socket){
   socket.on('message', function(channel, message){
 
     if (channel === 'confirmIdentity'){
-      if (message.pollID) {pollID = message.pollID}
-      else if (message.adminID) {pollID = admins[message.adminID]}
+      if (message.pageType === 'poll') {pollID = message.pageID}
+      else if (message.pageType === 'admin') {pollID = admins[message.pageID]}
       clientID = message.clientID
 
-      socket.emit('voteSummary', polls[pollID])
+      socket.emit('voteSummary', {poll: polls[pollID], pollID: pollID})
 
       if (knownVote(pollID, clientID)) {
         var vote = polls[pollID].votes[clientID]
@@ -47,16 +47,14 @@ server.on('connection', function(socket){
 
     } else if (channel === 'voteCast') {
       polls[pollID].votes[clientID] = message
-      server.sockets.emit('voteSummary', polls[pollID])
+      server.sockets.emit('voteSummary', {poll: polls[pollID], pollID: pollID})
 
       var vote = polls[pollID].votes[clientID]
       socket.emit('confirmVote', polls[pollID].responses[vote])
 
     } else if (channel === 'saveExpiration') {
-
       polls[pollID].expiration = message
-console.log(polls[pollID].expiration)
-      server.sockets.emit('newExpiration', polls[pollID].expiration)
+      server.sockets.emit('newExpiration', {pollExpiration: polls[pollID].expiration, pollID: pollID})
     }
   })
 
