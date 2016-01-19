@@ -103,12 +103,16 @@ function pageType(){
   return pathBits[pathBits.length-2]
 }
 
+function isAdminPage(){
+  return pageType() === 'admin'
+}
+
 function relevantClient(pollID){
   return (pollID === clientPollID)
 }
 
 function visualizeResults(poll){
-  if (!poll.private){
+  if (!poll.private || isAdminPage() ){
     var voteCounts = votesCast(poll.votes)
     var totalVoteCount = totalVotes(voteCounts)
     for (var vote in poll.responses){
@@ -119,6 +123,7 @@ function visualizeResults(poll){
         changeButtonWidth(vote, votePercent)
       }
     }
+    renderTotalVoteCount(totalVoteCount)
   }
 }
 
@@ -170,4 +175,15 @@ function renderResultPercentage(vote, votePercent){
 function changeButtonWidth(vote, votePercent){
   var width = (votePercent)/2 + 50
   $('#' + vote).css('width', width + '%')
+}
+
+function renderTotalVoteCount(totalVoteCount){
+  var totalVotesDiv = document.getElementById('total-votes')
+  totalVotesDiv.className = 'total-votes'
+  totalVotesDiv.innerText = totalVoteCount + ' ' + pluralizeVote(totalVoteCount)
+}
+
+function pluralizeVote(count){
+  if (count === 1) {return 'vote'}
+  else {return 'votes'}
 }

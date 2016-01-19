@@ -26,6 +26,15 @@ input {
   display: inline-block;
 }
 
+#total-votes {
+  color: red;
+  font-weight: bolder;
+  font-size: 18px;
+  text-align: center;
+  width: 50px;
+  border-top: 2px solid #ccc
+}
+
 .responses button {
   width: 90%;
   margin-left: 10px;
@@ -61,6 +70,7 @@ input {
 #expiration-message {
   color: red;
   font-weight: bolder;
+  margin-top: -21px;
 }
 
 #new-comment input {
