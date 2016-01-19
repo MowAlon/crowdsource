@@ -22,12 +22,12 @@ if (!module.parent) {
 const server = socketIO(server_instance)
 //////////////////////
 
-var polls = {}
-var admins = {}
+app.locals.polls = {}
+app.locals.admins = {}
 
 if (!module.parent) {
-  polls = demoPollData('polls')
-  admins = demoPollData('admins')
+  app.locals.polls = demoPollData('polls')
+  app.locals.admins = demoPollData('admins')
 }
 
 server.on('connection', function(socket){
@@ -42,8 +42,8 @@ server.on('connection', function(socket){
 
     if (channel === 'confirmIdentity'){
       if (message.pageType === 'poll') {pollID = message.pageID}
-      else if (message.pageType === 'admin') {pollID = admins[message.pageID]}
-      poll = polls[pollID]
+      else if (message.pageType === 'admin') {pollID = app.locals.admins[message.pageID]}
+      poll = app.locals.polls[pollID]
       clientID = message.clientID
 
       socket.emit('loadPageData', {poll: poll, pollID: pollID})
@@ -99,23 +99,19 @@ app.get('/', function (request, response){
 app.post('/newpoll', function(request, response){
   var adminID = generateID()
   var pollID = generateID()
-  admins[adminID] = pollID
-  console.log("2 admins from server.js -->", admins)
+  app.locals.admins[adminID] = pollID
 
-  polls[pollID] = pollWithoutEmptyResponses(request.body)
-  polls[pollID].votes = {}
-  polls[pollID].comments = []
-
-  app.locals.polls = polls
-  app.locals.admins = admins
+  app.locals.polls[pollID] = pollWithoutEmptyResponses(request.body)
+  app.locals.polls[pollID].votes = {}
+  app.locals.polls[pollID].comments = []
 
   response.redirect('/admin/' + adminID)
 })
 
 app.get('/admin/:id', function(request, response){
   var adminID = request.params.id
-  var pollID = admins[adminID]
-  if (polls[pollID]){response.render('poll', {poll: polls[pollID],
+  var pollID = app.locals.admins[adminID]
+  if (app.locals.polls[pollID]){response.render('poll', {poll: app.locals.polls[pollID],
                                                   publicPath: accessPath('poll', pollID),
                                                   adminPath: accessPath('admin', adminID),
                                                   admin: true})}
@@ -124,7 +120,7 @@ app.get('/admin/:id', function(request, response){
 
 app.get('/poll/:id', function(request, response){
   var id = request.params.id
-  if (polls[id]){response.render('poll', {poll: polls[id],
+  if (app.locals.polls[id]){response.render('poll', {poll: app.locals.polls[id],
                                           admin: false})}
   else {response.render('404')}
 })
