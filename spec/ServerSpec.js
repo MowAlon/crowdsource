@@ -35,6 +35,22 @@ describe("Server", function(){
       app.locals.admins = {}
     })
 
+    it("should redirect to the admin page", function(done){
+      var validPoll = {question: "Question about people",
+                       responses: {a: "Alon",
+                                   b: "Bret",
+                                   c: "Chase",
+                                   d: ""}
+                      }
+      request.post("http://localhost:9876/newpoll", {form: validPoll}, function(error, response){
+        if (error) {done(error)}
+        var adminKey = Object.keys(app.locals.admins)[0]
+
+        expect(response.headers.location).toBe('/admin/' + adminKey)
+        done()
+      })
+    })
+
     it('should receive and store a poll', function(done) {
       var validPoll = {question: "Question about people",
                        responses: {a: "Alon",
@@ -42,38 +58,36 @@ describe("Server", function(){
                                    c: "Chase",
                                    d: ""}
                       }
-      var startingPollCount = Object.keys(app.locals.polls).length
-
 
       request.post("http://localhost:9876/newpoll", {form: validPoll}, function(error, response) {
         if (error) {done(error)}
         var finalPollCount = Object.keys(app.locals.polls).length
 
-        expect(finalPollCount).toBe(startingPollCount + 1)
+        expect(finalPollCount).toBe(1)
         done()
       })
     })
 
-    xit('should create an admin that links to the stored poll', (done) => {
+    it('should create an admin that links to the stored poll', function(done){
       var validPoll = {question: "Question about people",
                        responses: {a: "Alon",
                                    b: "Bret",
                                    c: "Chase",
                                    d: ""}
                       }
-      var startingAdminCount = Object.keys(app.locals.admins).length
 
       request.post("http://localhost:9876/newpoll", {form: validPoll}, function(error, response) {
         if (error) {done(error)}
+
         var finalAdminCount = Object.keys(app.locals.admins).length
+        expect(finalAdminCount).toBe(1)
 
-        expect(finalAdminCount).toBe(startingAdminCount + 1)
-        var pollID = app.locals.admins[finalAdminCount - 1]
-
+        var adminKey = Object.keys(app.locals.admins)[0]
+        var pollID = app.locals.admins[adminKey]
         expect(app.locals.polls[pollID].question).toBe("Question about people")
-
         done()
       })
     })
   })
+
 })

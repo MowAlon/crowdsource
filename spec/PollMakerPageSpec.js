@@ -8,9 +8,6 @@ describe("PollMaker", function(){
       if (error) { return done(error) }
       done()
     })
-    // this.request = request.defaults({
-    //   baseURL: "http://localhost:9876/"
-    // })
   })
 
   afterAll(function(){
@@ -66,34 +63,3 @@ describe("PollMaker", function(){
   })
 
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// var polls = {}
-// polls["publicdemo"] =
-//              {question: "Question about people",
-//               responses: {a: "Alon",
-//                           b: "Bret",
-//                           c: "Chase",
-//                           d: ""},
-//               votes: {clientID1: 'a'},
-//               comments: [{time: Date(),
-//                           name: "Commenter 1",
-//                           comment: "Comment 1"},
-//                          {time: Date(),
-//                           name: "Commenter 2",
-//                           comment: "Comment 2"}
-//                         ]
-//              }
