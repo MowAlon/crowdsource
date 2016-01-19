@@ -78,11 +78,24 @@ input {
 }
 
 .comment {
-  border: 1px solid black;
-  padding: 5px;
+  border: 1px solid #ccc;
+  padding: 10px;
   margin: 5px;
 }
 
+.comment-time {
+  color: #ccc;
+}
+
+.comment-name {
+  font-weight: bolder;
+  text-decoration: underline;
+}
+
+.comment-comment {
+  margin-left: 40px;
+}
+
 hr {
-  border-color: black;
+  border-color: #aaa;
 }

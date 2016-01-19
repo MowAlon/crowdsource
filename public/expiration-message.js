@@ -1,10 +1,10 @@
 displayExpirationMessage(pollExpiration)
 
 function displayExpirationMessage(expirationForDisplay){
+  var expirationDiv = document.getElementById('expiration-message')
   if (expirationForDisplay) {
-    expiration = document.getElementById('expiration-message')
-    expiration.innerText = expirationMessage(expirationForDisplay)
-  } else {expiration.innerText = ''}
+    expirationDiv.innerText = expirationMessage(expirationForDisplay)
+  } else {expirationDiv.innerText = ''}
 }
 
 function expirationMessage(expirationForDisplay){
@@ -12,8 +12,8 @@ function expirationMessage(expirationForDisplay){
   else {return 'Poll closes ' + moment(expirationForDisplay).calendar()}
 }
 
-function pollExpired(expirationForDisplay){
+function pollExpired(expiration){
   var now = moment()
-  var expiration = moment(expirationForDisplay)
+  expiration = moment(expiration)
   return (expiration <= now)
 }

@@ -6,6 +6,7 @@ const socketIO = require('socket.io')
 const bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({ extended: true }))
 const generateID = require('./lib/generate-id')
+const loadDemoPolls = require('./lib/load-demo-polls')
 const moment = require('./public/lib/moment.min.js')
 
 var port = process.env.PORT || 3000
@@ -16,10 +17,9 @@ var server_instance = http.createServer(app)
 const server = socketIO(server_instance)
 //////////////////////
 
-var polls = {}
-var admins = {}
-var votes = {}
-storeDemoPolls()
+var polls = loadDemoPolls('polls')
+var admins = loadDemoPolls('admins')
+// var votes = {}
 
 server.on('connection', function(socket){
   var pollID
@@ -29,8 +29,6 @@ server.on('connection', function(socket){
   var clientID
   socket.emit('handshake', newClientID)
 
-  // server.sockets.emit('usersConnected', server.engine.clientsCount)
-
   socket.on('message', function(channel, message){
 
     if (channel === 'confirmIdentity'){
@@ -39,7 +37,7 @@ server.on('connection', function(socket){
       poll = polls[pollID]
       clientID = message.clientID
 
-      socket.emit('loadExistingData', {poll: poll, pollID: pollID})
+      socket.emit('loadPageData', {poll: poll, pollID: pollID})
 
       if (knownVote(pollID, clientID)) {
         var vote = poll.votes[clientID]
@@ -50,7 +48,7 @@ server.on('connection', function(socket){
 
     else if (channel === 'voteCast') {
       poll.votes[clientID] = message
-      server.sockets.emit('loadExistingData', {poll: poll, pollID: pollID})
+      server.sockets.emit('updateVotes', {poll: poll, pollID: pollID})
 
       var vote = poll.votes[clientID]
       socket.emit('confirmVote', poll.responses[vote])
@@ -67,7 +65,7 @@ server.on('connection', function(socket){
                      comment: message.comment}
 
       poll.comments.push(comment)
-      server.sockets.emit('displayNewComment', {comment: comment, pollID: pollID})
+      server.sockets.emit('newComment', {comment: comment, pollID: pollID})
     }
 
   })
@@ -77,7 +75,7 @@ server.on('connection', function(socket){
   })
 
   function knownVote(pollID, clientID){
-    return (newClientID !== clientID && polls[pollID].votes && polls[pollID].votes[clientID])
+    return (newClientID !== clientID && poll && poll.votes && poll.votes[clientID])
   }
 })
 
@@ -97,7 +95,6 @@ app.post('/newpoll', function(request, response){
   polls[pollID] = pollWithoutEmptyResponses(request.body)
   polls[pollID].votes = {}
   polls[pollID].comments = []
-  // pry = require('pryjs'); eval(pry.it)
 
   response.redirect('/admin/' + adminID)
 })
@@ -120,44 +117,6 @@ app.get('/poll/:id', function(request, response){
 })
 
 ///// ROUTES /////
-
-function storeDemoPolls(){
-  polls['publicdemo'] =
-               {question: 'Who put the bop in the bop shabop shabop?',
-                responses: {a: "Bret",
-                            b: "Matt",
-                            c: "That guy in the back of the club",
-                            d: "Yogi Bear"},
-                votes: {},
-                comments: [{time: 'Mon Jan 17 2016 11:31:03 GMT-0700 (MST)',
-                                   name: 'Clarence',
-                                   comment: "Was't it Zach?"},
-                           {time: 'Mon Jan 18 2016 15:30:03 GMT-0700 (MST)',
-                                   name: 'Thomas',
-                                   comment: "I always thought it was Queen Latifah."}
-                          ]
-               }
-
-  polls['privatedemo'] =
-              {question: 'What is your greatest fear?',
-               responses: {a: "Clowns",
-                           b: "Jeff's hair",
-                           c: "That guy in the back of the club",
-                           d: "Black holes"},
-               private: 'on',
-               votes: {},
-               comments: [{time: 'Mon Jan 18 2016 11:31:03 GMT-0700 (MST)',
-                                  name: 'Clarence',
-                                  comment: "I'm scared of everything!"},
-                          {time: 'Mon Jan 18 2016 11:31:03 GMT-0700 (MST)',
-                                  name: 'Clarence',
-                                  comment: "I'm scared of everything!"}
-                         ]
-              }
-
-  admins = {publicdemo: 'publicdemo',
-            privatedemo: 'privatedemo'}
-}
 
 function pollWithoutEmptyResponses(poll){
   for (var response in poll.responses){

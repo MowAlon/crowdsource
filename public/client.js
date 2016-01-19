@@ -1,22 +1,35 @@
 var client = io()
 var clientPollID
-commentsDiv = document.getElementById('comments')
-
+var responseButtons = document.querySelectorAll('.responses button')
+var commentsDiv = document.getElementById('comments')
+adjustButtonListeners()
 
 client.on('handshake', function(id){
   localStorage.clientID = localStorage.clientID || id
   client.send('confirmIdentity', {clientID: localStorage.clientID, pageID: pageID(), pageType: pageType()})
 })
 
-client.on('loadExistingData', function(pollData){
+client.on('loadPageData', function(pollData){
   var poll = pollData.poll
   var pollID = pollData.pollID
   clientPollID = clientPollID || pollID
 
   if (relevantClient(pollID)){
-    if (!poll.private) {visualizeResults(poll)}
+    visualizeResults(poll)
     loadComments(poll.comments)
   }
+})
+
+client.on('updateVotes', function(pollData){
+  var poll = pollData.poll
+  var pollID = pollData.pollID
+  if (relevantClient(pollID)){visualizeResults(poll)}
+})
+
+client.on('newComment', function(commentData){
+  var comment = commentData.comment
+  var pollID = commentData.pollID
+  if (relevantClient(pollID)) {addComment(comment)}
 })
 
 client.on('newExpiration', function(pollData){
@@ -26,13 +39,8 @@ client.on('newExpiration', function(pollData){
   if (relevantClient(pollID)) {
     displayExpirationMessage(pollExpiration)
     adjustButtons(pollExpiration)
+    adjustButtonListeners()
   }
-})
-
-client.on('displayNewComment', function(commentData){
-  var comment = commentData.comment
-  var pollID = commentData.pollID
-  if (relevantClient(pollID)) {addComment(comment)}
 })
 
 document.getElementById('comment-button').addEventListener('click', function(){
@@ -53,13 +61,6 @@ if (!admin){
                         "<h2>" + vote + "</h2>"
   })
 
-  var responseButtons = document.querySelectorAll('.responses .btn')
-  for (var i=0; i < responseButtons.length; i++){
-    responseButtons[i].addEventListener('click', function(){
-      client.send('voteCast', this.id)
-    })
-  }
-
 } else {
 
   document.getElementById('close-poll').addEventListener('click', function(){
@@ -76,6 +77,22 @@ if (!admin){
 
 ///////////////////////////////////////////////////////
 
+function sendVoteCast(){
+  client.send('voteCast', this.id)
+}
+
+function adjustButtonListeners() {
+  if (responseButtons[0].className === 'dead-button') {
+    for (var i=0; i < responseButtons.length; i++){
+      responseButtons[i].removeEventListener('click', sendVoteCast)
+    }
+  } else {
+    for (var i=0; i < responseButtons.length; i++){
+      responseButtons[i].addEventListener('click', sendVoteCast)
+    }
+  }
+}
+
 function pageID(){
   var pathBits = window.location.pathname.split('/')
   return pathBits[pathBits.length-1]
@@ -91,8 +108,9 @@ function relevantClient(pollID){
 }
 
 function visualizeResults(poll){
-  var voteCounts = votesCast(poll.votes)
-  var totalVoteCount = totalVotes(voteCounts)
+  if (!poll.private){
+    var voteCounts = votesCast(poll.votes)
+    var totalVoteCount = totalVotes(voteCounts)
     for (var vote in poll.responses){
       var voteCount = voteCounts[vote] || 0
       var votePercent = (voteCount / totalVoteCount * 100) || 0
@@ -100,6 +118,7 @@ function visualizeResults(poll){
         renderResultPercentage(vote, votePercent)
         changeButtonWidth(vote, votePercent)
       }
+    }
   }
 }
 
@@ -110,6 +129,7 @@ function loadComments(comments){
                      return 0
                    })
 
+  $(commentsDiv).empty()
   sortedComments.forEach(function(comment){
     addComment(comment)
   })
@@ -117,12 +137,12 @@ function loadComments(comments){
 
 function addComment(comment){
   var commentHTML =
-          "<div class='comment'>" +
-            "<p class='comment-time'>" + comment.time + "</p>" +
-            "<p class='comment-name'>" + comment.name + "</p>" +
+          "<div class='comment panel'>" +
+            "<p class='comment-time text-right'>" + moment(comment.time).calendar() + "</p>" +
+            "<h4 class='comment-name'>" + comment.name + " said:</h4>" +
             "<p class='comment-comment'>" + comment.comment + "</p>" +
           "</div>"
-  $(commentsDiv).append(commentHTML)
+  $(commentsDiv).prepend(commentHTML)
 }
 
 function votesCast(votes){
