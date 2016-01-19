@@ -60,7 +60,6 @@ describe("PollMaker", function(){
   it("should have a checkbox called 'private'", function(done){
     request.get('http://localhost:9876/', (error, response) => {
       if (error) { done(error) }
-      console.log(response.body)
       expect(response.body.includes("<input type='checkbox' name='private'")).toBe(true)
       done()
     })

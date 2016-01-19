@@ -7,7 +7,7 @@ const socketIO = require('socket.io')
 const bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({ extended: true }))
 const generateID = require('./lib/generate-id')
-const loadDemoPolls = require('./lib/load-demo-polls')
+const demoPollData = require('./lib/demo-poll-data')
 const moment = require('./public/lib/moment.min.js')
 
 var port = process.env.PORT || 3000
@@ -22,8 +22,13 @@ if (!module.parent) {
 const server = socketIO(server_instance)
 //////////////////////
 
-var polls = loadDemoPolls('polls')
-var admins = loadDemoPolls('admins')
+var polls = {}
+var admins = {}
+
+if (!module.parent) {
+  polls = demoPollData('polls')
+  admins = demoPollData('admins')
+}
 
 server.on('connection', function(socket){
   console.log('A user has connected.', server.engine.clientsCount)
@@ -95,10 +100,14 @@ app.post('/newpoll', function(request, response){
   var adminID = generateID()
   var pollID = generateID()
   admins[adminID] = pollID
+  console.log("2 admins from server.js -->", admins)
 
   polls[pollID] = pollWithoutEmptyResponses(request.body)
   polls[pollID].votes = {}
   polls[pollID].comments = []
+
+  app.locals.polls = polls
+  app.locals.admins = admins
 
   response.redirect('/admin/' + adminID)
 })
