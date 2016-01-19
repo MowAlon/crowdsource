@@ -14,17 +14,17 @@
     <section class='create-poll'>
       <form action='/newpoll' method='post'>
         <div class='well'>
-          <input required type='text' placeholder='What do you want to ask?' name='question' class='form-control question'>
+          <input required type='text' name='question' placeholder='What do you want to ask?' class='form-control question'>
         </div>
         <div class='well'>
-          <input required type='text' placeholder='Put your responses here.' name='responses[a]' class='form-control' id='response-a'>
-          <input required type='text' placeholder='These first two are required.*' name='responses[b]' class='form-control' id='response-b'>
-          <input type='text' placeholder='Optional additional response' name='responses[c]' class='form-control' id='response-c'>
-          <input type='text' placeholder='Optional additional response' name='responses[d]' class='form-control' id='response-d'>
+          <input required type='text' name='responses[a]' placeholder='Put your responses here.' class='form-control' id='response-a'>
+          <input required type='text' name='responses[b]' placeholder='These first two are required.*' class='form-control' id='response-b'>
+          <input type='text' name='responses[c]' placeholder='Optional additional response' class='form-control' id='response-c'>
+          <input type='text' name='responses[d]' placeholder='Optional additional response' class='form-control' id='response-d'>
           <div class='row'>
             <div class='col-xs-6'>
               <input type='submit' class='submit-poll btn btn-primary'>
-              <input type="checkbox" name='private' id='private'> Private poll
+              <input type='checkbox' name='private' id='private'> Private poll
             </div>
             <div class='col-xs-6'>
               <% include /expiration-input %>

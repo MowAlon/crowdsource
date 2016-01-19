@@ -7,13 +7,6 @@ function adjustButtons(newPollExpiration){
 
 /////////////////////////
 
-// function pollExpired(){
-//   var now = moment()
-//   var expiration = moment(pollExpiration)
-//   console.log('poll expired? ', expiration <= now)
-//   return (expiration <= now)
-// }
-
 function killButtons() {
   $('.responses button').each(function(index, button){
     killButton(button)

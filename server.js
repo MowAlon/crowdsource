@@ -1,6 +1,7 @@
 const http = require('http')
 const express = require('express')
 const app = express()
+app.locals.title = 'Crowdsource'
 app.set('view engine', 'ejs')
 const socketIO = require('socket.io')
 const bodyParser = require('body-parser')
@@ -10,21 +11,24 @@ const loadDemoPolls = require('./lib/load-demo-polls')
 const moment = require('./public/lib/moment.min.js')
 
 var port = process.env.PORT || 3000
-var server_instance = http.createServer(app)
-                          .listen(port, function(){
-                            console.log('Listening on port ' + port + '.')
-                            })
+
+if (!module.parent) {
+  var server_instance = http.createServer(app)
+                            .listen(port, function(){
+                              console.log('Listening on port ' + port + '.')
+  })
+}
+
 const server = socketIO(server_instance)
 //////////////////////
 
 var polls = loadDemoPolls('polls')
 var admins = loadDemoPolls('admins')
-// var votes = {}
 
 server.on('connection', function(socket){
+  console.log('A user has connected.', server.engine.clientsCount)
   var pollID
   var poll
-  console.log('A user has connected.', server.engine.clientsCount)
   var newClientID = generateID()
   var clientID
   socket.emit('handshake', newClientID)
@@ -122,7 +126,6 @@ function pollWithoutEmptyResponses(poll){
   for (var response in poll.responses){
     if (!poll.responses[response]){delete poll.responses[response]}
   }
-
   return poll
 }
 
@@ -130,5 +133,5 @@ function accessPath(base, id){
   return '/' + base + '/' + id
 }
 
-module.exports = server
+module.exports = app
 // pry = require('pryjs'); eval(pry.it)
