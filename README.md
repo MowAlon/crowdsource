@@ -1,7 +1,7 @@
 # Crowdsource
 This is an easy-to-use polling app with live updating via web sockets.
 
-**Links to mess around with a playable demo**
+**Links to a playable demo**
 
 [Create a new poll](https://mowalon-crowdsource.herokuapp.com/)
 
@@ -24,8 +24,8 @@ Upon creating a poll, the creator/admin is given an admin link along with the pu
 
 ## Screenshots
 
-Creating a new poll!
+**Creating a new poll!**
 <center><img src="screenshots/screenshot_new-poll.png">
 
-After you've voted
+**After you've voted**
 <img src="screenshots/screenshot_results.png"></center>
