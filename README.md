@@ -1,6 +1,8 @@
 # Crowdsource
 This is an easy-to-use polling app with live updating via web sockets.
+
 **Links to mess around with a playable demo**
+
 [Create a new poll](https://mowalon-crowdsource.herokuapp.com/)
 
 [Public poll, voting page](https://mowalon-crowdsource.herokuapp.com/poll/publicdemo)
