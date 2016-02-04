@@ -3,11 +3,11 @@ This is an easy-to-use polling app with live updating via web sockets.
 
 **Links to a playable demo**
 
-[Create a new poll](https://mowalon-crowdsource.herokuapp.com/)
+* [Create a new poll](https://mowalon-crowdsource.herokuapp.com/)
 
-[Public poll, voting page](https://mowalon-crowdsource.herokuapp.com/poll/publicdemo)
+* [Public poll, voting page](https://mowalon-crowdsource.herokuapp.com/poll/publicdemo)
 
-[Public poll, admin page](https://mowalon-crowdsource.herokuapp.com/admin/publicdemo)
+* [Public poll, admin page](https://mowalon-crowdsource.herokuapp.com/admin/publicdemo)
 
 ## Notable pieces of this project
 **Live updates using web sockets**
